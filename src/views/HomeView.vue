@@ -24,6 +24,7 @@
         >
           <MagnifyIcon fillColor="#515151" class="ml-2" :size="18" />
           <input
+          @click="showFindFriends = !showFindFriends"
             class="
               ml-5
               apperance-none
@@ -51,7 +52,7 @@
     <template v-else>
       <findFriendsView class="pt-28" />
     </template>
-    <div v-if="open">
+    <div v-if="userDataForChat.length">
       <message-view />
     </div>
     <div
@@ -192,15 +193,26 @@ import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
 import ChatsView from "./ChatsView.vue";
 import MessageView from "./MessageView.vue";//findFriendsView
 import findFriendsView from "./FindFriendsView.vue";
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useUserStore } from '../store/user-store';
 const userStore = useUserStore();
+import { storeToRefs } from 'pinia';
+
+const {showFindFriends, userDataForChat } = storeToRefs(userStore);
+
 import { useRouter } from 'vue-router';
 const router = useRouter();
 let open = ref(true);//showFindFriends
-let showFindFriends = ref(false);
+// let showFindFriends = ref(false);
+
+onMounted(() => {
+  try {
+    userStore.getAllUsers()
+  } catch (error) {
+    console.log(error)
+  }
+})
 const logout = () => {
-  console.log("اى حاجة")
   let res = confirm('are you sure you want to logout?')
   if(res) userStore.logout();  router.push('/login');
 }
