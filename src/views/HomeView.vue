@@ -24,7 +24,7 @@
         >
           <MagnifyIcon fillColor="#515151" class="ml-2" :size="18" />
           <input
-          @click="showFindFriends = !showFindFriends"
+          @click="(showFindFriends == true)? showFindFriends = false:  showFindFriends = true"
             class="
               ml-5
               apperance-none
@@ -47,10 +47,11 @@
       </div>
     </div>
     <template v-if="showFindFriends">
-      <ChatsView class="mt-[100px]" />
+      <findFriendsView class="pt-28" />
     </template>
     <template v-else>
-      <findFriendsView class="pt-28" />
+      <ChatsView class="mt-[100px]" />
+
     </template>
     <div v-if="userDataForChat.length">
       <message-view />
@@ -186,7 +187,6 @@
   </div>
 </template>
 <script setup>
-//node_modules\vue-material-design-icons\DotsVertical.vue
 import AccountGroupIcon from "vue-material-design-icons/AccountGroup.vue";
 import DotsVeritcalIcon from "vue-material-design-icons/DotsVertical.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
@@ -202,17 +202,18 @@ const {showFindFriends, userDataForChat } = storeToRefs(userStore);
 
 import { useRouter } from 'vue-router';
 const router = useRouter();
-let open = ref(true);//showFindFriends
-// let showFindFriends = ref(false);
-
-onMounted(() => {
+let open = ref(true);
+onMounted(async () => {
   try {
-    userStore.getAllUsers()
+    await userStore.getAllUsers();
+    await userStore.getAllChatsByUser()
+
   } catch (error) {
     console.log(error)
   }
 })
 const logout = () => {
+  console.log("logout")
   let res = confirm('are you sure you want to logout?')
   if(res) userStore.logout();  router.push('/login');
 }

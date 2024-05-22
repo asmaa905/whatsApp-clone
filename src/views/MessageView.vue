@@ -5,13 +5,13 @@
     <div class="border-l border-green-500 w-full">
         <div class="bg-[#f0f0f0] fixed z-10 min-w-[calc(100vw-420px)] flex justify-between items-center px-2 py-2">
             <div class="flex items-center">
-                <img class="rounded-full mx-1 w-10" src="https://random.imagecdn.app/100/100" alt="">
+                <img class="rounded-full mx-1 w-10" :src="userStore.userDataForChat[0].picture || ''" alt="">
                 <div class="text-gray-900 ml-1 font-semibold">
-                    Frank
+                    {{ userStore.userDataForChat[0].firstName || '' }}
                 </div>
             </div>
             <DotsVeritcalIcon fillColor="#515151"  />
-
+            
         </div>
     </div>
     <div 
@@ -27,25 +27,29 @@
         touch-auto
     "
     >
-     <div class="px-20 text-sm">
-        <div class="flex w-[calc(100%-50px)]">
-            <div  class="inline-block bg-white p-2 rounded-md my-1">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Expedita error aperiam suscipit consectetur itaque ea ipsum debitis cupiditate, consequuntur molestiae in temporibus repellendus nesciunt esse nisi. Omnis ducimus rem autem.
+
+     <div v-if="currentChat && currentChat.length" class="px-20 text-sm">
+        <div v-for="msg in currentChat[0].messages" :key="msg">
+            <div v-if="msg.sub === sub" class="flex w-[calc(100%-50px)]">
+                <div  class="inline-block bg-white p-2 rounded-md my-1">
+                {{ msg.message }}
+                </div>
+            </div>
+            <div v-else class="flex justify-end space-x-1 w-[calc(100%-50px)] float-right">
+                <div  class="inline-block bg-green-200 p-2 rounded-md my-1">
+                    {{ msg.message }}
+                </div>
             </div>
         </div>
-        <div class="flex justify-end space-x-1 w-[calc(100%-50px)] float-right">
-            <div  class="inline-block bg-green-200 p-2 rounded-md my-1">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Expedita error aperiam suscipit consectetur itaque ea ipsum debitis cupiditate, consequuntur molestiae in temporibus repellendus nesciunt esse nisi. Omnis ducimus rem autem.
-            </div>
-        </div>
+
      </div>
     </div>
     <div class="w-[calc(100vw-420px)] p-2.5 z-10 bg-[#f0f0f0] fixed bottom-0">
         <div class="flex items-center justify-center">
             <EmoticonExcitedOutlineIcon :size="27" fillColor="#515151" class="mx-1.5" />
             <PaperClipIcon :size="27" fillColor="#515151" class="mx-1.5 mr-3"  />
-
             <input
+            v-model="message"
             class="
               mr-1
               shadow
@@ -64,8 +68,9 @@
             placeholder="Message"
           >
           <button 
-          class="ml-3 p-2 w-12 flex items-center justify-center"
-      >
+            @click="sendMessage()"
+            class="ml-3 p-2 w-12 flex items-center justify-center"
+          >
           <SendIcon fillColor="#515151" />
       </button>
         </div>
@@ -80,6 +85,20 @@ import EmoticonExcitedOutlineIcon from "vue-material-design-icons/EmoticonExcite
 import PaperClipIcon from "vue-material-design-icons/PaperClip.vue";
 import SendIcon from "vue-material-design-icons/Send.vue";
 
+import { ref } from 'vue';
+import { useUserStore } from '../store/user-store';
+import { storeToRefs } from 'pinia';
+
+const userStore = useUserStore()
+const { userDataForChat, currentChat, sub } = storeToRefs(userStore)
+let message = ref('');
+const sendMessage = async ()=>{
+    await userStore.sendMessage({
+        message: message.value,
+        sub2: userDataForChat.value[0].sub2,
+        chatId: userDataForChat.value[0].id,
+    })
+}
 </script>
 <style scoped>
 #BG {

@@ -21,9 +21,10 @@ import { useUserStore } from '../store/user-store';
 import { storeToRefs } from 'pinia';
 
 const userStore = useUserStore();
-const {sub, userDataForChat  } = storeToRefs(userStore);
+const {sub, userDataForChat,chats  } = storeToRefs(userStore);
 
 const createNewChat = (user) => {
+    if(userDataForChat.value.filter((user)=>user.id ))
     userDataForChat.value = [];
     userDataForChat.value.push({
         id:'',
